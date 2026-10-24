@@ -38,14 +38,6 @@ MuJoCo シミュレーションです。
 ランダム配置12エピソード（物体5個、指示3種類）でのタスク成功率: 物体単位 **100 %（60/60）**、全物体が正しく片付いたエピソード **12/12**。
 提出動画の2シナリオも 10/10 物体で成功（把持失敗の故障注入1回から自動復帰）。結果は `outputs/eval.json`, `outputs/results.json` に保存されます。
 
-## 提出物
-
-| 提出物 | 場所 |
-| --- | --- |
-| 動画（2分13秒・等倍速・1280×720） | `python -m pai_tidy.run --demo` で `outputs/demo.mp4` に生成 |
-| レポート PDF | `report/説明資料_PAI最終課題_omnicampusアカウント名.pdf`（`python report/build_report.py --account <アカウント名> --video-url <URL>` で再生成） |
-| コード | このリポジトリ |
-
 ## 動かし方
 
 動作確認環境: Ubuntu 24.04, Python 3.12, CPU のみ（GPU 不要）。
