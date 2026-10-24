@@ -1,0 +1,126 @@
+[
+ {
+  "success": 4,
+  "total": 4,
+  "rows": [
+   {
+    "object": "red cube",
+    "expected": "red",
+    "actual": "red",
+    "ok": true
+   },
+   {
+    "object": "blue ball",
+    "expected": "blue",
+    "actual": "blue",
+    "ok": true
+   },
+   {
+    "object": "green cylinder",
+    "expected": "green",
+    "actual": "green",
+    "ok": true
+   },
+   {
+    "object": "blue cube",
+    "expected": "blue",
+    "actual": "blue",
+    "ok": true
+   }
+  ],
+  "title": "シナリオ1: 色ごとの片付け",
+  "instruction": "テーブルの上のものを同じ色のトレイに片付けて",
+  "plan": [
+   "すべての物体 → 同じ色のトレイ"
+  ],
+  "stats": {
+   "picks": 4,
+   "placed": 4,
+   "grasp_failures": 0,
+   "retries": 0,
+   "skipped": [],
+   "owl_boxes": 34,
+   "owl_corrected": 17,
+   "infer_seconds": [
+    2.144371509552002,
+    2.4155850410461426,
+    2.5749008655548096,
+    2.5840954780578613,
+    2.3115525245666504
+   ]
+  },
+  "wall_seconds": 213.0,
+  "sim_seconds": 39.9
+ },
+ {
+  "success": 6,
+  "total": 6,
+  "rows": [
+   {
+    "object": "red ball",
+    "expected": "blue",
+    "actual": "blue",
+    "ok": true
+   },
+   {
+    "object": "blue ball",
+    "expected": "blue",
+    "actual": "blue",
+    "ok": true
+   },
+   {
+    "object": "yellow cube",
+    "expected": "green",
+    "actual": "green",
+    "ok": true
+   },
+   {
+    "object": "green cube",
+    "expected": "green",
+    "actual": "green",
+    "ok": true
+   },
+   {
+    "object": "red cylinder",
+    "expected": "red",
+    "actual": "red",
+    "ok": true
+   },
+   {
+    "object": "yellow cylinder",
+    "expected": "stay",
+    "actual": "table",
+    "ok": true
+   }
+  ],
+  "title": "シナリオ2: 複合指示 + 失敗・外乱からの復帰",
+  "instruction": "ボールは全部青いトレイに入れて、黄色いキューブは緑の箱へ。それから残りを色ごとに片付けて",
+  "plan": [
+   "ボール → 青のトレイ",
+   "黄色いキューブ → 緑のトレイ",
+   "すべての物体 → 同じ色のトレイ"
+  ],
+  "stats": {
+   "picks": 6,
+   "placed": 5,
+   "grasp_failures": 1,
+   "retries": 1,
+   "skipped": [
+    "yellow cylinder"
+   ],
+   "owl_boxes": 63,
+   "owl_corrected": 40,
+   "infer_seconds": [
+    1.953986644744873,
+    2.082867383956909,
+    1.991626501083374,
+    2.030357837677002,
+    1.890491247177124,
+    1.9997100830078125,
+    1.9286553859710693
+   ]
+  },
+  "wall_seconds": 291.2,
+  "sim_seconds": 56.9
+ }
+]

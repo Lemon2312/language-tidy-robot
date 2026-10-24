@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>説明資料 PAI最終課題 omnicampusアカウント名</title>
+<style>
+  @page { size: A4; margin: 14mm 14mm 14mm 14mm; }
+  body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: #1d2330; font-size: 10.2pt; line-height: 1.6; }
+  h1 { font-size: 19pt; margin: 0 0 2mm; line-height: 1.3; }
+  h2 { font-size: 13pt; border-left: 5px solid #2f7de1; padding-left: 8px; margin: 6mm 0 2mm; }
+  h2, h3 { break-after: avoid; page-break-after: avoid; }
+  .figs, table.t { break-inside: avoid; }
+  h3 { font-size: 11pt; margin: 3mm 0 1mm; color: #23406e; }
+  .sub { color: #4a5568; font-size: 10pt; margin-bottom: 3mm; }
+  .meta { background: #f2f5fa; border-radius: 6px; padding: 3mm 4mm; font-size: 9.5pt; }
+  .meta td { padding: 0 8px 0 0; vertical-align: top; }
+  .meta td:first-child { white-space: nowrap; }
+  table.t { border-collapse: collapse; width: 100%; font-size: 9.3pt; margin: 2mm 0; }
+  table.t th, table.t td { border: 1px solid #cfd6e3; padding: 3px 6px; text-align: left; }
+  table.t th { background: #e8eef8; }
+  .flow { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 2mm 0; font-size: 8.8pt; }
+  .flow div.b { background: #e8f0fd; border: 1px solid #9dbcf0; border-radius: 5px; padding: 3px 6px; }
+  .flow div.ai { background: #fff2d9; border-color: #f0b44c; }
+  .flow span { color: #7a8699; }
+  .figs { display: flex; gap: 3mm; margin: 2mm 0; }
+  .figs figure { margin: 0; flex: 1; }
+  .figs img { width: 100%; border-radius: 4px; border: 1px solid #d5dbe6; }
+  figcaption { font-size: 8.5pt; color: #4a5568; text-align: center; }
+  .hl { background: #fff6dd; padding: 0 2px; }
+  ol, ul { margin: 1mm 0 1mm 5mm; padding-left: 4mm; }
+  li { margin-bottom: 0.6mm; }
+  .pb { page-break-before: always; }
+  .small { font-size: 8.8pt; color: #4a5568; }
+</style>
+</head>
+<body>
+
+<h1>言語指示で動く片付けロボット<br><span style="font-size:13pt;font-weight:normal">— オープン語彙物体検出AI × 深度による3D検証 × 閉ループ把持制御 —</span></h1>
+<div class="sub">Physical AI 応用1講座 最終課題 ／ 提出者: omnicampusアカウント名</div>
+<table class="meta">
+  <tr><td><b>動画</b></td><td>（YouTube の URL をここに記載）（2分13秒・<b>等倍速</b>）</td></tr>
+  <tr><td><b>コード</b></td><td>GitHub リポジトリ（README に実行手順を記載）</td></tr>
+  <tr><td><b>使用ツール</b></td><td>MuJoCo 3.17（物理シミュレータ）, Franka Emika Panda（MuJoCo Menagerie）, OWLv2（Hugging Face Transformers）, Python 3.12 ／ GPU なし・CPU のみで動作</td></tr>
+</table>
+
+<h2>1. 課題の概要</h2>
+<p>「ボールは全部青いトレイに入れて、黄色いキューブは緑の箱へ。それから残りを色ごとに片付けて」のような<b>自然言語の指示</b>を受け取り、
+ロボットアームが机の上の物体を見つけて、指示どおりのトレイへ片付けるタスクを実装しました。
+物体の発見には<b>オープン語彙物体検出AI「OWLv2」</b>を推論で用い、その出力を<b>深度画像から復元した3次元形状で検証・補正</b>してから把持します。
+1手ごとにカメラで観測し直す<b>閉ループ</b>構成なので、把持の失敗や、作業中に人が物体を動かすといった外乱からも自動で復帰します。</p>
+
+<h2>2. 目的</h2>
+<ul>
+  <li>家庭や倉庫の「片付け・仕分け」を、プログラミングなしに<b>言葉だけで指示できる</b>ロボットを目指す。</li>
+  <li>大規模事前学習モデル（OWLv2）を<b>学習なし（推論のみ）</b>でロボットに組み込み、どこまで実用になるかを定量的に確かめる。</li>
+  <li>AIの認識誤りや把持失敗が起きても、<b>システム全体として正しく作業を終える</b>ための仕組み（検証・再試行）を作る。</li>
+</ul>
+
+<h2>3. システム構成</h2>
+<div class="flow">
+  <div class="b">自然言語の指示</div><span>→</span>
+  <div class="b">言語理解<br>（計画に分解）</div><span>→</span>
+  <div class="b">観測姿勢へ退避<br>俯瞰RGB-D撮影</div><span>→</span>
+  <div class="b ai">OWLv2 推論<br>（候補領域）</div><span>→</span>
+  <div class="b ai">深度で3D復元<br>形状・色・向きを検証</div><span>→</span>
+  <div class="b">対象と行き先<br>を決定</div><span>→</span>
+  <div class="b">IK + 重力補償<br>で把持・運搬</div><span>→</span>
+  <div class="b">指の開き幅で<br>把持判定</div><span>→</span>
+  <div class="b">再観測で検証<br>（失敗なら再試行）</div>
+</div>
+<div class="figs">
+  <figure><img src="figures/scene.png"><figcaption>図1 動画の1コマ。右側に指示・実行計画・AI知覚を表示（故障注入による把持失敗を検知した場面）</figcaption></figure>
+  <figure><img src="figures/panel.png"><figcaption>図2 AI認識の説明画面。橙枠は OWLv2 のラベル誤りを3D検証で補正した物体</figcaption></figure>
+</div>
+
+<h3>3.1 AIによる物体認識（OWLv2 + 3D検証）</h3>
+<ul>
+  <li>俯瞰カメラ画像に対し、「a red cube」「a blue tray」など<b>色×形状の全組合せ（16 クエリ）</b>をテキストで与えて OWLv2 で検出（CPU で 1 枚約 2.2 秒）。</li>
+  <li>OWLv2 は物体の<b>位置</b>はほぼ確実に捉える一方、<b>色・形状のラベル</b>はよく誤る（トレイを cube、円柱を ball と答える等）。そこで検出枠ごとに深度画像を3D点群へ逆投影し、
+    <ul>
+      <li>机やトレイ底面からの<b>相対高さ</b>で物体だけを切り出す（トレイの中の物体も分離できる）</li>
+      <li>外形サイズでトレイ/物体を判別、<b>上面の平坦さ</b>で球を、<b>高さ</b>でキューブ/円柱を判別</li>
+      <li>彩度の高い画素の<b>色相ヒストグラムの最頻値</b>で色を判定（影やトレイ内の他物体に頑健）</li>
+      <li>上面の点群の<b>最小外接矩形</b>からキューブの向き（ヨー角）を推定し、把持方向を合わせる</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>3.2 言語理解</h3>
+<p>日本語/英語の指示を「対象（色・形状、指定なし＝すべて）→ 行き先（トレイの色 / 同じ色）」の順序付きリストに分解します。
+「全部」「残り」「色ごと」「AとBを〜」「それから」などに対応し、例えば上記の指示は
+<i>[ボール→青] [黄色いキューブ→緑] [すべて→同じ色]</i> になります。環境変数 <code>OPENAI_API_KEY</code> がある場合は LLM（gpt-4o-mini）で同じ形式の JSON を生成し、失敗時は自動でルールベースに戻ります（提出動画はオフラインのルールベースで実行）。</p>
+
+<h3>3.3 制御</h3>
+<ul>
+  <li>減衰最小二乗法による<b>逆運動学</b>（位置＋姿勢の6自由度、ヌル空間で肘の姿勢を維持）と、min-jerk 補間による滑らかな直線軌道。</li>
+  <li>関節サーボだけでは重力で手先が約 6 mm 下がるため、<b>重力・コリオリ補償のフィードフォワード</b>を追加し、手先誤差を約 1 mm に低減。</li>
+  <li>物体の高さの中央を把持し、トレイ底面の約 1 cm 上まで下ろしてから<b>半開き</b>で離す（トレイの壁に指を当てない／背の高い物体を倒さない）。</li>
+</ul>
+
+<h2>4. 工夫した点</h2>
+<ol>
+  <li><b>AI と幾何のハイブリッド認識</b>：OWLv2 単体のラベル正解率は 35.9%（物体のみでも 53.9%）でしたが、深度による3D検証を組み合わせることで <span class="hl"><b>100.0%</b></span> に向上しました（§5）。AI の得意な「どこに何かある」と、幾何の得意な「正確な形・大きさ・向き」を役割分担させています。</li>
+  <li><b>動画の中で AI の判断を可視化</b>：OWLv2 の生の出力と補正後のラベルを並べて表示し、何をどう直したかが見て分かるようにしました（図2）。</li>
+  <li><b>閉ループの実行</b>：1 手ごとに観測し直して結果を検証します。把持失敗（指が閉じきる）や運搬中の落下を検知すると再観測して再試行し、作業中に人が物体を動かしても新しい位置に追従します。動画では<b>故障注入</b>（把持位置を意図的に 4 cm ずらす）と<b>外乱</b>（人が物体を動かす）で実演しています。</li>
+  <li><b>実行できない指示の判断</b>：「色ごとに片付けて」で行き先のトレイが存在しない黄色い物体は、勝手に別のトレイへ入れず「保留」と判断して机に残します。</li>
+  <li><b>シミュレーションの物理的な問題の切り分けと対策</b>：評価中、円柱だけが運搬中に指から滑り落ちる現象を発見しました。接触力を調べると、円柱と指先の小さな箱形パッドとの接触法線が不安定だったため、円柱の衝突形状を 24 角柱メッシュに置き換え（見た目は円柱のまま）、グリッパの把持力を約 2 N から約 12 N に強化しました。その結果、物体を指定位置まで運ぶテストでの落下は 2/18 回から 0/60 回になりました。</li>
+  <li><b>GPU 不要</b>：OWLv2・物理演算・描画（OSMesa）をすべて CPU で実行でき、誰でも再現できます。</li>
+</ol>
+
+<h2>5. 評価</h2>
+<h3>5.1 認識精度（ランダム配置 30 シーン、物体6個＋トレイ3個 = 270 件）</h3>
+<div class="figs">
+  <figure style="flex:1.1"><img src="figures/accuracy.png" style="border:none"><figcaption>図3 ラベル（色＋形状）正解率</figcaption></figure>
+  <div style="flex:1">
+  <table class="t">
+    <tr><th>指標</th><th>結果</th></tr>
+    <tr><td>検出率（物体・トレイ）</td><td>270/270</td></tr>
+    <tr><td>ラベル正解率 OWLv2のみ</td><td>35.9%</td></tr>
+    <tr><td>ラベル正解率 OWLv2+3D検証</td><td><b>100.0%</b></td></tr>
+    <tr><td>物体位置誤差（平均/最大）</td><td>0.47 / 0.94 mm</td></tr>
+    <tr><td>キューブ向き誤差（平均）</td><td>0.51°</td></tr>
+  </table>
+  </div>
+</div>
+<h3>5.2 タスク成功率（ランダム配置 12 エピソード × 物体5個、指示3種類）</h3>
+<p>物体単位の正解率（最終的に正しいトレイ、または指示どおり机の上に残っている割合）は <b>100.0%</b>、
+全物体が正しく片付いたエピソードは <b>12/12（100.0%）</b>でした。判定はシミュレータの真値で行い、エージェント自身は真値を一切使っていません。</p>
+<h3>5.3 提出動画の各シナリオ</h3>
+<table class="t">
+  <tr><th>シナリオ</th><th>正解/物体数</th><th>把持回数</th><th>把持失敗の検知</th><th>保留した物体</th><th>OWLv2ラベル補正</th></tr>
+  <tr><td>シナリオ1: 色ごとの片付け</td><td>4/4</td><td>4</td><td>0</td><td>–</td><td>17/34</td></tr><tr><td>シナリオ2: 複合指示 + 失敗・外乱からの復帰</td><td>6/6</td><td>6</td><td>1</td><td>yellow cylinder</td><td>40/63</td></tr>
+</table>
+
+<h2>6. 動画の構成（等倍速）</h2>
+<ol>
+  <li>タイトル：システムの全体像を説明</li>
+  <li>シナリオ1「テーブルの上のものを同じ色のトレイに片付けて」：AI認識の説明画面 → 4 物体を色ごとに仕分け</li>
+  <li>シナリオ2：複合指示の分解、故障注入による把持失敗→検知→再試行、作業中の外乱（人が物体を移動）への追従、行き先の無い物体の保留</li>
+  <li>結果のまとめ</li>
+</ol>
+
+<h2>7. 考察・反省点と今後の課題</h2>
+<ul>
+  <li><b>AI 単体の限界と補完</b>：OWLv2 は「何かがある場所」の検出には非常に強い一方、シミュレーション画像の単純な物体では色や形の語を取り違えやすいことが分かりました。基盤モデルをそのまま信じるのではなく、別のセンサ情報で検証する設計が実用上重要だと感じました。</li>
+  <li><b>形状判定の前提</b>：キューブと円柱の区別には物体の高さを使っており、物体の寸法をおおよそ知っている前提です。未知の物体へ広げるには、点群の法線分布の利用や、SAM などのセグメンテーションAIとの組合せが考えられます。</li>
+  <li><b>把持の汎用性</b>：現在は真上からの把持のみです。形状に応じた把持姿勢の生成（学習ベースの把持検出など）や、積み重なった物体への対応が今後の課題です。</li>
+  <li><b>Sim-to-Real</b>：照明や質感が単純なシミュレーションで評価しているため、実機では色判定の閾値や深度ノイズへの対策が必要です。描画のランダム化（ドメインランダム化）による評価を追加したいと考えています。</li>
+  <li><b>言語理解</b>：ルールベースは決定的で速い反面、言い回しへの対応に限界があります。LLM パーサを用意しましたが、API キーが無い環境のため提出動画では使っていません。ローカル LLM の組込みも検討したいです。</li>
+</ul>
+
+<h2>8. 参考・使用素材</h2>
+<ul class="small">
+  <li>MuJoCo（DeepMind, Apache-2.0）／ MuJoCo Menagerie franka_emika_panda（Apache-2.0）</li>
+  <li>M. Minderer et al., “Scaling Open-Vocabulary Object Detection” (OWLv2), NeurIPS 2023 ／ google/owlv2-base-patch16-ensemble（Apache-2.0）</li>
+  <li>講座の最終課題サンプル「Pick and Place Task」「ChatGPT APIによる自然言語ロボット操作」を発想の出発点とし、コードは独自に実装しました。</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+assets/franka_emika_panda/_generated_scene.xml
+outputs/*.mp4
+out/
+uploads/
+report/.chrome/

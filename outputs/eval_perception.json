@@ -1,0 +1,12 @@
+{
+ "perception": {
+  "scenes": 30,
+  "items": 270,
+  "detected": 270,
+  "label_acc_owl_only": 0.359,
+  "label_acc_hybrid": 1.0,
+  "pos_err_mm_mean": 0.47,
+  "pos_err_mm_max": 0.94,
+  "cube_yaw_err_deg_mean": 0.51
+ }
+}

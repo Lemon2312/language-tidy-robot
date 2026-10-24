@@ -1,0 +1,116 @@
+{
+ "perception": {
+  "scenes": 30,
+  "items": 270,
+  "detected": 270,
+  "label_acc_owl_only": 0.359,
+  "label_acc_hybrid": 1.0,
+  "label_acc_owl_only_objects": 0.539,
+  "pos_err_mm_mean": 0.47,
+  "pos_err_mm_max": 0.94,
+  "cube_yaw_err_deg_mean": 0.51
+ },
+ "task": {
+  "trials": 12,
+  "object_success_rate": 1.0,
+  "episode_success_rate": 1.0,
+  "details": [
+   {
+    "seed": 2000,
+    "instruction": "テーブルの上のものを同じ色のトレイに片付けて",
+    "success": 5,
+    "total": 5,
+    "picks": 4,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2001,
+    "instruction": "ボールは全部青いトレイに入れて、それから残りを色ごとに片付けて",
+    "success": 5,
+    "total": 5,
+    "picks": 5,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2002,
+    "instruction": "Put the cubes into the green tray, then sort the rest by color.",
+    "success": 5,
+    "total": 5,
+    "picks": 3,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2003,
+    "instruction": "テーブルの上のものを同じ色のトレイに片付けて",
+    "success": 5,
+    "total": 5,
+    "picks": 2,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2004,
+    "instruction": "ボールは全部青いトレイに入れて、それから残りを色ごとに片付けて",
+    "success": 5,
+    "total": 5,
+    "picks": 4,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2005,
+    "instruction": "Put the cubes into the green tray, then sort the rest by color.",
+    "success": 5,
+    "total": 5,
+    "picks": 3,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2006,
+    "instruction": "テーブルの上のものを同じ色のトレイに片付けて",
+    "success": 5,
+    "total": 5,
+    "picks": 3,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2007,
+    "instruction": "ボールは全部青いトレイに入れて、それから残りを色ごとに片付けて",
+    "success": 5,
+    "total": 5,
+    "picks": 4,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2008,
+    "instruction": "Put the cubes into the green tray, then sort the rest by color.",
+    "success": 5,
+    "total": 5,
+    "picks": 4,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2009,
+    "instruction": "テーブルの上のものを同じ色のトレイに片付けて",
+    "success": 5,
+    "total": 5,
+    "picks": 4,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2010,
+    "instruction": "ボールは全部青いトレイに入れて、それから残りを色ごとに片付けて",
+    "success": 5,
+    "total": 5,
+    "picks": 4,
+    "grasp_failures": 0
+   },
+   {
+    "seed": 2011,
+    "instruction": "Put the cubes into the green tray, then sort the rest by color.",
+    "success": 5,
+    "total": 5,
+    "picks": 4,
+    "grasp_failures": 0
+   }
+  ]
+ }
+}
